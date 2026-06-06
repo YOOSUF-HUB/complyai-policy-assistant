@@ -96,7 +96,7 @@
             </div>
 
             <div class="alert alert-info mt-4">
-                <strong>Phase 3:</strong> The document is now split into chunks. Next phase: convert chunks into embeddings.
+                <strong>Phase 4:</strong> The document is now chunked, embedded, and stored in FAISS. Next phase: retrieve relevant chunks for a user question.
             </div>
         </div>
 
@@ -157,6 +157,17 @@
                             <p class="mb-0">
                                 Upload a PDF to generate text chunks.
                             </p>
+                        </div>
+                    {% endif %}
+                    {% if embedding_count %}
+                        <div class="border rounded-3 p-3 bg-light mt-3">
+                            <small class="text-muted d-block mb-1">Embeddings Created</small>
+                            <strong>{{ embedding_count }}</strong>
+                        </div>
+
+                        <div class="border rounded-3 p-3 bg-light mt-3">
+                            <small class="text-muted d-block mb-1">Vector Dimension</small>
+                            <strong>{{ vector_dimension }}</strong>
                         </div>
                     {% endif %}
 

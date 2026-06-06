@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.pdf_reader import extract_text_from_pdf
 from app.text_splitter import split_text_into_chunks
+from app.vector_store import build_faiss_index
 
 
 app = FastAPI(title="ComplyAI - AI Policy Compliance Assistant")
@@ -26,6 +27,13 @@ CURRENT_DOCUMENT = {
     "chunks": []
 }
 
+VECTOR_STORE = {
+    "index": None,
+    "chunks": [],
+    "embedding_count": 0,
+    "dimension": 0
+}
+
 
 def render_home(
     request: Request,
@@ -34,11 +42,10 @@ def render_home(
     message=None,
     error=None,
     chunk_count=0,
-    sample_chunks=None
+    sample_chunks=None,
+    embedding_count=0,
+    vector_dimension=0
 ):
-    """
-    Reusable function to render the homepage.
-    """
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -50,7 +57,9 @@ def render_home(
             "message": message,
             "error": error,
             "chunk_count": chunk_count,
-            "sample_chunks": sample_chunks or []
+            "sample_chunks": sample_chunks or [],
+            "embedding_count": embedding_count,
+            "vector_dimension": vector_dimension
         }
     )
 
@@ -61,17 +70,14 @@ async def home(request: Request):
         request=request,
         filename=CURRENT_DOCUMENT["filename"],
         chunk_count=len(CURRENT_DOCUMENT["chunks"]),
-        sample_chunks=CURRENT_DOCUMENT["chunks"][:3]
+        sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
+        embedding_count=VECTOR_STORE["embedding_count"],
+        vector_dimension=VECTOR_STORE["dimension"]
     )
 
 
 @app.post("/upload", response_class=HTMLResponse)
 async def upload_pdf(request: Request, file: UploadFile = File(...)):
-    """
-    Handle PDF upload, save it, extract text, split text into chunks,
-    and display preview.
-    """
-
     try:
         if not file.filename.lower().endswith(".pdf"):
             return render_home(
@@ -100,17 +106,26 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
             overlap=150
         )
 
+        vector_store = build_faiss_index(chunks)
+
         CURRENT_DOCUMENT["filename"] = file.filename
         CURRENT_DOCUMENT["text"] = extracted_text
         CURRENT_DOCUMENT["chunks"] = chunks
+
+        VECTOR_STORE["index"] = vector_store["index"]
+        VECTOR_STORE["chunks"] = vector_store["chunks"]
+        VECTOR_STORE["embedding_count"] = vector_store["embedding_count"]
+        VECTOR_STORE["dimension"] = vector_store["dimension"]
 
         return render_home(
             request=request,
             filename=file.filename,
             text_preview=extracted_text[:2000],
-            message="PDF uploaded, text extracted, and chunks created successfully.",
+            message="PDF uploaded, text extracted, chunks created, and vector store built successfully.",
             chunk_count=len(chunks),
-            sample_chunks=chunks[:3]
+            sample_chunks=chunks[:3],
+            embedding_count=VECTOR_STORE["embedding_count"],
+            vector_dimension=VECTOR_STORE["dimension"]
         )
 
     except Exception as error:
