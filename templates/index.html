@@ -23,8 +23,7 @@
             <h4 class="text-muted mb-3">{{ subtitle }}</h4>
 
             <p class="lead mb-0">
-                Upload a policy, rules, legal, or compliance PDF. The system extracts text, creates embeddings,
-                and retrieves the most relevant chunks for your question.
+                Upload a policy, rules, legal, or compliance PDF. Ask questions and get answers grounded in the uploaded document.
             </p>
         </div>
     </div>
@@ -40,7 +39,7 @@
                     <h5 class="fw-bold mb-2">1. Upload Document</h5>
 
                     <p class="text-muted small">
-                        Upload a PDF document. The system will extract text, chunk it, embed it, and store it in FAISS.
+                        Upload a PDF document. The system will extract text, create chunks, generate embeddings, and build a FAISS vector store.
                     </p>
 
                     {% if message %}
@@ -69,7 +68,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
-                            Upload and Build Vector Store
+                            Upload and Process PDF
                         </button>
 
                     </form>
@@ -113,13 +112,13 @@
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-4">
 
-                        <h5 class="fw-bold mb-2">2. Test Retrieval</h5>
+                        <h5 class="fw-bold mb-2">2. Ask Question</h5>
 
                         <p class="text-muted small">
-                            Ask a question. FAISS will return the most relevant document chunks.
+                            Ask a question. The system will retrieve relevant chunks and generate a grounded answer using Gemini.
                         </p>
 
-                        <form action="/retrieve" method="post">
+                        <form action="/ask" method="post">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Question</label>
                                 <textarea
@@ -131,7 +130,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-success w-100">
-                                Retrieve Relevant Chunks
+                                Generate Answer
                             </button>
                         </form>
 
@@ -140,8 +139,8 @@
             {% endif %}
 
             <div class="alert alert-info mt-4">
-                <strong>Phase 5:</strong> The system can now retrieve relevant chunks for a question.
-                Next phase: generate final answers using Gemini.
+                <strong>Phase 6:</strong> The system can now generate answers using retrieved document chunks.
+                Next phase: add compliance workflows such as checklist, risk detection, and reports.
             </div>
 
         </div>
@@ -149,20 +148,39 @@
         <!-- Right Panel -->
         <div class="col-lg-8">
 
+            {% if answer %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-bold mb-2">AI Answer</h5>
+
+                        <p class="text-muted small">
+                            Generated using the retrieved document chunks as context.
+                        </p>
+
+                        <div
+                            class="border rounded-3 p-3"
+                            style="background: #eff6ff; color: #1e3a8a; white-space: pre-wrap; font-size: 15px; line-height: 1.8;"
+                        >{{ answer }}</div>
+
+                    </div>
+                </div>
+            {% endif %}
+
             {% if retrieved_chunks %}
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
 
-                        <h5 class="fw-bold mb-2">Retrieved Chunks</h5>
+                        <h5 class="fw-bold mb-2">Source Chunks</h5>
 
                         <p class="text-muted small">
-                            These are the chunks FAISS selected as most relevant to your question.
+                            These are the retrieved chunks used as context for the answer.
                         </p>
 
                         {% for item in retrieved_chunks %}
                             <div class="border rounded-3 p-3 bg-white mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <strong>Result {{ loop.index }}</strong>
+                                    <strong>Source {{ loop.index }}</strong>
                                     <span class="badge text-bg-primary">
                                         Score: {{ "%.4f"|format(item.score) }}
                                     </span>

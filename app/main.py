@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from app.pdf_reader import extract_text_from_pdf
 from app.text_splitter import split_text_into_chunks
 from app.vector_store import build_faiss_index, search_similar_chunks
+from app.ai_service import generate_answer_from_chunks
 
 
 app = FastAPI(title="ComplyAI - AI Policy Compliance Assistant")
@@ -46,7 +47,8 @@ def render_home(
     embedding_count=0,
     vector_dimension=0,
     question=None,
-    retrieved_chunks=None
+    retrieved_chunks=None,
+    answer=None
 ):
     return templates.TemplateResponse(
         request=request,
@@ -63,7 +65,8 @@ def render_home(
             "embedding_count": embedding_count,
             "vector_dimension": vector_dimension,
             "question": question,
-            "retrieved_chunks": retrieved_chunks or []
+            "retrieved_chunks": retrieved_chunks or [],
+            "answer": answer
         }
     )
 
@@ -139,8 +142,8 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
         )
 
 
-@app.post("/retrieve", response_class=HTMLResponse)
-async def retrieve_chunks(request: Request, question: str = Form(...)):
+@app.post("/ask", response_class=HTMLResponse)
+async def ask_question(request: Request, question: str = Form(...)):
     try:
         if not CURRENT_DOCUMENT["text"]:
             return render_home(
@@ -154,17 +157,23 @@ async def retrieve_chunks(request: Request, question: str = Form(...)):
             top_k=4
         )
 
+        answer = generate_answer_from_chunks(
+            question=question,
+            retrieved_chunks=retrieved_chunks
+        )
+
         return render_home(
             request=request,
             filename=CURRENT_DOCUMENT["filename"],
             text_preview=CURRENT_DOCUMENT["text"][:2000],
-            message="Relevant chunks retrieved successfully.",
+            message="Answer generated successfully.",
             chunk_count=len(CURRENT_DOCUMENT["chunks"]),
             sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
             embedding_count=VECTOR_STORE["embedding_count"],
             vector_dimension=VECTOR_STORE["dimension"],
             question=question,
-            retrieved_chunks=retrieved_chunks
+            retrieved_chunks=retrieved_chunks,
+            answer=answer
         )
 
     except Exception as error:
