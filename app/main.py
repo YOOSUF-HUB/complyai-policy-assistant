@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from app.pdf_reader import extract_text_from_pdf
 from app.text_splitter import split_text_into_chunks
 from app.vector_store import build_faiss_index, search_similar_chunks
-from app.ai_service import generate_answer_from_chunks
+from app.ai_service import generate_answer_from_chunks, generate_compliance_output
 
 
 app = FastAPI(title="ComplyAI - AI Policy Compliance Assistant")
@@ -48,7 +48,9 @@ def render_home(
     vector_dimension=0,
     question=None,
     retrieved_chunks=None,
-    answer=None
+    answer=None,
+    compliance_result=None,
+    task_type=None
 ):
     return templates.TemplateResponse(
         request=request,
@@ -66,7 +68,9 @@ def render_home(
             "vector_dimension": vector_dimension,
             "question": question,
             "retrieved_chunks": retrieved_chunks or [],
-            "answer": answer
+            "answer": answer,
+            "compliance_result": compliance_result,
+            "task_type": task_type
         }
     )
 
@@ -128,7 +132,7 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
             request=request,
             filename=file.filename,
             text_preview=extracted_text[:2000],
-            message="PDF uploaded, text extracted, chunks created, and vector store built successfully.",
+            message="PDF uploaded and processed successfully.",
             chunk_count=len(chunks),
             sample_chunks=chunks[:3],
             embedding_count=VECTOR_STORE["embedding_count"],
@@ -174,6 +178,45 @@ async def ask_question(request: Request, question: str = Form(...)):
             question=question,
             retrieved_chunks=retrieved_chunks,
             answer=answer
+        )
+
+    except Exception as error:
+        return render_home(
+            request=request,
+            filename=CURRENT_DOCUMENT["filename"],
+            chunk_count=len(CURRENT_DOCUMENT["chunks"]),
+            sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
+            embedding_count=VECTOR_STORE["embedding_count"],
+            vector_dimension=VECTOR_STORE["dimension"],
+            error=str(error)
+        )
+
+
+@app.post("/compliance-task", response_class=HTMLResponse)
+async def compliance_task(request: Request, task_type: str = Form(...)):
+    try:
+        if not CURRENT_DOCUMENT["text"]:
+            return render_home(
+                request=request,
+                error="Please upload a PDF before running a compliance workflow."
+            )
+
+        compliance_result = generate_compliance_output(
+            task_type=task_type,
+            document_text=CURRENT_DOCUMENT["text"]
+        )
+
+        return render_home(
+            request=request,
+            filename=CURRENT_DOCUMENT["filename"],
+            text_preview=CURRENT_DOCUMENT["text"][:2000],
+            message="Compliance workflow completed successfully.",
+            chunk_count=len(CURRENT_DOCUMENT["chunks"]),
+            sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
+            embedding_count=VECTOR_STORE["embedding_count"],
+            vector_dimension=VECTOR_STORE["dimension"],
+            compliance_result=compliance_result,
+            task_type=task_type
         )
 
     except Exception as error:

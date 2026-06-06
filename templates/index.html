@@ -5,7 +5,6 @@
     <title>{{ app_name }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -13,24 +12,23 @@
 
 <div class="container py-5">
 
-    <!-- Header -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-5">
-            <span class="badge text-bg-primary mb-3">RAG + Compliance AI</span>
+            <span class="badge text-bg-primary mb-3">RAG + Compliance Workflows</span>
 
             <h1 class="fw-bold mb-2">{{ app_name }}</h1>
 
             <h4 class="text-muted mb-3">{{ subtitle }}</h4>
 
             <p class="lead mb-0">
-                Upload a policy, rules, legal, or compliance PDF. Ask questions and get answers grounded in the uploaded document.
+                Upload a policy, rules, legal, or compliance PDF. Ask questions, summarize rules,
+                generate checklists, detect risks, and create compliance reports.
             </p>
         </div>
     </div>
 
     <div class="row g-4">
 
-        <!-- Left Panel -->
         <div class="col-lg-4">
 
             <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -39,7 +37,7 @@
                     <h5 class="fw-bold mb-2">1. Upload Document</h5>
 
                     <p class="text-muted small">
-                        Upload a PDF document. The system will extract text, create chunks, generate embeddings, and build a FAISS vector store.
+                        The system extracts text, chunks it, embeds it, and stores it in FAISS.
                     </p>
 
                     {% if message %}
@@ -55,7 +53,6 @@
                     {% endif %}
 
                     <form action="/upload" method="post" enctype="multipart/form-data">
-
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Choose PDF</label>
                             <input
@@ -70,12 +67,11 @@
                         <button type="submit" class="btn btn-primary w-100">
                             Upload and Process PDF
                         </button>
-
                     </form>
 
                     <hr class="my-4">
 
-                    <h6 class="fw-bold">Current Document</h6>
+                    <h6 class="fw-bold">Document Status</h6>
 
                     {% if filename %}
                         <div class="border rounded-3 p-3 bg-light mb-3">
@@ -83,22 +79,26 @@
                             <strong>{{ filename }}</strong>
                         </div>
 
-                        <div class="border rounded-3 p-3 bg-light mb-3">
-                            <small class="text-muted d-block mb-1">Chunks Created</small>
-                            <strong>{{ chunk_count }}</strong>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="border rounded-3 p-3 bg-light">
+                                    <small class="text-muted d-block mb-1">Chunks</small>
+                                    <strong>{{ chunk_count }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="border rounded-3 p-3 bg-light">
+                                    <small class="text-muted d-block mb-1">Embeddings</small>
+                                    <strong>{{ embedding_count }}</strong>
+                                </div>
+                            </div>
                         </div>
 
-                        {% if embedding_count %}
-                            <div class="border rounded-3 p-3 bg-light mb-3">
-                                <small class="text-muted d-block mb-1">Embeddings Created</small>
-                                <strong>{{ embedding_count }}</strong>
-                            </div>
-
-                            <div class="border rounded-3 p-3 bg-light">
-                                <small class="text-muted d-block mb-1">Vector Dimension</small>
-                                <strong>{{ vector_dimension }}</strong>
-                            </div>
-                        {% endif %}
+                        <div class="border rounded-3 p-3 bg-light mt-2">
+                            <small class="text-muted d-block mb-1">Vector Dimension</small>
+                            <strong>{{ vector_dimension }}</strong>
+                        </div>
                     {% else %}
                         <div class="border rounded-3 p-3 bg-light text-muted">
                             No document uploaded yet.
@@ -109,18 +109,17 @@
             </div>
 
             {% if filename %}
-                <div class="card border-0 shadow-sm rounded-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
 
                         <h5 class="fw-bold mb-2">2. Ask Question</h5>
 
                         <p class="text-muted small">
-                            Ask a question. The system will retrieve relevant chunks and generate a grounded answer using Gemini.
+                            Ask a document-specific question.
                         </p>
 
                         <form action="/ask" method="post">
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Question</label>
                                 <textarea
                                     name="question"
                                     class="form-control"
@@ -136,33 +135,87 @@
 
                     </div>
                 </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-bold mb-2">3. Compliance Workflows</h5>
+
+                        <p class="text-muted small">
+                            Run structured AI workflows on the uploaded document.
+                        </p>
+
+                        <form action="/compliance-task" method="post" class="mb-2">
+                            <input type="hidden" name="task_type" value="summary">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                Summarize Rules
+                            </button>
+                        </form>
+
+                        <form action="/compliance-task" method="post" class="mb-2">
+                            <input type="hidden" name="task_type" value="checklist">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                Generate Compliance Checklist
+                            </button>
+                        </form>
+
+                        <form action="/compliance-task" method="post" class="mb-2">
+                            <input type="hidden" name="task_type" value="risks">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                Find Risks
+                            </button>
+                        </form>
+
+                        <form action="/compliance-task" method="post">
+                            <input type="hidden" name="task_type" value="report">
+                            <button type="submit" class="btn btn-outline-dark w-100">
+                                Generate Compliance Report
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
             {% endif %}
 
             <div class="alert alert-info mt-4">
-                <strong>Phase 6:</strong> The system can now generate answers using retrieved document chunks.
-                Next phase: add compliance workflows such as checklist, risk detection, and reports.
+                <strong>Phase 7:</strong> The app now supports Q&A plus compliance workflows.
             </div>
 
         </div>
 
-        <!-- Right Panel -->
         <div class="col-lg-8">
 
             {% if answer %}
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-
                         <h5 class="fw-bold mb-2">AI Answer</h5>
-
                         <p class="text-muted small">
-                            Generated using the retrieved document chunks as context.
+                            Generated using retrieved document chunks.
                         </p>
 
                         <div
                             class="border rounded-3 p-3"
                             style="background: #eff6ff; color: #1e3a8a; white-space: pre-wrap; font-size: 15px; line-height: 1.8;"
                         >{{ answer }}</div>
+                    </div>
+                </div>
+            {% endif %}
 
+            {% if compliance_result %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-2">Compliance Output</h5>
+
+                        {% if task_type %}
+                            <p class="text-muted small">
+                                Workflow: <strong>{{ task_type|capitalize }}</strong>
+                            </p>
+                        {% endif %}
+
+                        <div
+                            class="border rounded-3 p-3"
+                            style="background: #f8fafc; white-space: pre-wrap; font-size: 15px; line-height: 1.8;"
+                        >{{ compliance_result }}</div>
                     </div>
                 </div>
             {% endif %}
@@ -170,11 +223,9 @@
             {% if retrieved_chunks %}
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-
                         <h5 class="fw-bold mb-2">Source Chunks</h5>
-
                         <p class="text-muted small">
-                            These are the retrieved chunks used as context for the answer.
+                            Retrieved chunks used as context for the answer.
                         </p>
 
                         {% for item in retrieved_chunks %}
@@ -191,42 +242,36 @@
                                 </div>
                             </div>
                         {% endfor %}
-
                     </div>
                 </div>
             {% endif %}
 
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
-
                     <h5 class="fw-bold mb-2">Extracted Text Preview</h5>
-
                     <p class="text-muted small">
-                        First 2,000 characters of the extracted PDF text.
+                        First 2,000 characters of the uploaded document.
                     </p>
 
                     {% if text_preview %}
                         <div
                             class="border rounded-3 p-3 bg-dark text-light"
-                            style="white-space: pre-wrap; max-height: 350px; overflow-y: auto; font-size: 14px; line-height: 1.7;"
+                            style="white-space: pre-wrap; max-height: 300px; overflow-y: auto; font-size: 14px; line-height: 1.7;"
                         >{{ text_preview }}</div>
                     {% else %}
                         <div class="border rounded-3 p-5 bg-light text-center text-muted">
                             <h6 class="fw-bold">No extracted text yet</h6>
                             <p class="mb-0">
-                                Upload a PDF to see the extracted text preview here.
+                                Upload a PDF to begin.
                             </p>
                         </div>
                     {% endif %}
-
                 </div>
             </div>
 
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-
                     <h5 class="fw-bold mb-2">Sample Chunks</h5>
-
                     <p class="text-muted small">
                         First few chunks created from the document.
                     </p>
@@ -248,11 +293,10 @@
                         <div class="border rounded-3 p-5 bg-light text-center text-muted">
                             <h6 class="fw-bold">No chunks created yet</h6>
                             <p class="mb-0">
-                                Upload a PDF to generate text chunks.
+                                Upload a PDF to generate chunks.
                             </p>
                         </div>
                     {% endif %}
-
                 </div>
             </div>
 
