@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.pdf_reader import extract_text_from_pdf
+from app.text_splitter import split_text_into_chunks
 
 
 app = FastAPI(title="ComplyAI - AI Policy Compliance Assistant")
@@ -21,7 +22,8 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
 CURRENT_DOCUMENT = {
     "filename": None,
-    "text": None
+    "text": None,
+    "chunks": []
 }
 
 
@@ -30,7 +32,9 @@ def render_home(
     filename=None,
     text_preview=None,
     message=None,
-    error=None
+    error=None,
+    chunk_count=0,
+    sample_chunks=None
 ):
     """
     Reusable function to render the homepage.
@@ -44,7 +48,9 @@ def render_home(
             "filename": filename,
             "text_preview": text_preview,
             "message": message,
-            "error": error
+            "error": error,
+            "chunk_count": chunk_count,
+            "sample_chunks": sample_chunks or []
         }
     )
 
@@ -53,14 +59,17 @@ def render_home(
 async def home(request: Request):
     return render_home(
         request=request,
-        filename=CURRENT_DOCUMENT["filename"]
+        filename=CURRENT_DOCUMENT["filename"],
+        chunk_count=len(CURRENT_DOCUMENT["chunks"]),
+        sample_chunks=CURRENT_DOCUMENT["chunks"][:3]
     )
 
 
 @app.post("/upload", response_class=HTMLResponse)
 async def upload_pdf(request: Request, file: UploadFile = File(...)):
     """
-    Handle PDF upload, save it, extract text, and display preview.
+    Handle PDF upload, save it, extract text, split text into chunks,
+    and display preview.
     """
 
     try:
@@ -85,14 +94,23 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
                 error="PDF uploaded, but no readable text was found."
             )
 
+        chunks = split_text_into_chunks(
+            text=extracted_text,
+            chunk_size=900,
+            overlap=150
+        )
+
         CURRENT_DOCUMENT["filename"] = file.filename
         CURRENT_DOCUMENT["text"] = extracted_text
+        CURRENT_DOCUMENT["chunks"] = chunks
 
         return render_home(
             request=request,
             filename=file.filename,
             text_preview=extracted_text[:2000],
-            message="PDF uploaded and text extracted successfully."
+            message="PDF uploaded, text extracted, and chunks created successfully.",
+            chunk_count=len(chunks),
+            sample_chunks=chunks[:3]
         )
 
     except Exception as error:

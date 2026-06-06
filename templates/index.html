@@ -23,7 +23,7 @@
             <h4 class="text-muted mb-3">{{ subtitle }}</h4>
 
             <p class="lead mb-0">
-                Upload a policy, rules, legal, or compliance PDF. The system will extract the text and prepare it for AI analysis.
+                Upload a policy, rules, legal, or compliance PDF. The system extracts text and splits it into chunks for AI retrieval.
             </p>
         </div>
     </div>
@@ -38,7 +38,7 @@
                     <h5 class="fw-bold mb-2">1. Upload Document</h5>
 
                     <p class="text-muted small">
-                        Upload a PDF document. In this phase, we only extract and preview the readable text.
+                        Upload a PDF document. The system will extract text and create overlapping chunks.
                     </p>
 
                     {% if message %}
@@ -67,7 +67,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
-                            Upload and Extract Text
+                            Upload and Create Chunks
                         </button>
 
                     </form>
@@ -77,9 +77,14 @@
                     <h6 class="fw-bold">Current Document</h6>
 
                     {% if filename %}
-                        <div class="border rounded-3 p-3 bg-light">
+                        <div class="border rounded-3 p-3 bg-light mb-3">
                             <small class="text-muted d-block mb-1">Filename</small>
                             <strong>{{ filename }}</strong>
+                        </div>
+
+                        <div class="border rounded-3 p-3 bg-light">
+                            <small class="text-muted d-block mb-1">Chunks Created</small>
+                            <strong>{{ chunk_count }}</strong>
                         </div>
                     {% else %}
                         <div class="border rounded-3 p-3 bg-light text-muted">
@@ -89,23 +94,28 @@
 
                 </div>
             </div>
+
+            <div class="alert alert-info mt-4">
+                <strong>Phase 3:</strong> The document is now split into chunks. Next phase: convert chunks into embeddings.
+            </div>
         </div>
 
         <!-- Right Panel -->
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
 
                     <h5 class="fw-bold mb-2">2. Extracted Text Preview</h5>
 
                     <p class="text-muted small">
-                        This confirms that the PDF text extraction step is working.
+                        First 2,000 characters of the extracted PDF text.
                     </p>
 
                     {% if text_preview %}
                         <div
                             class="border rounded-3 p-3 bg-dark text-light"
-                            style="white-space: pre-wrap; max-height: 500px; overflow-y: auto; font-size: 14px; line-height: 1.7;"
+                            style="white-space: pre-wrap; max-height: 350px; overflow-y: auto; font-size: 14px; line-height: 1.7;"
                         >{{ text_preview }}</div>
                     {% else %}
                         <div class="border rounded-3 p-5 bg-light text-center text-muted">
@@ -118,13 +128,43 @@
 
                 </div>
             </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-2">3. Sample Chunks</h5>
+
+                    <p class="text-muted small">
+                        These are the first few chunks created from the document. Later, each chunk will become a searchable vector.
+                    </p>
+
+                    {% if sample_chunks %}
+                        {% for chunk in sample_chunks %}
+                            <div class="border rounded-3 p-3 bg-white mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Chunk {{ loop.index }}</strong>
+                                    <span class="badge text-bg-secondary">{{ chunk|length }} chars</span>
+                                </div>
+
+                                <div style="white-space: pre-wrap; font-size: 14px; line-height: 1.7;">
+                                    {{ chunk }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="border rounded-3 p-5 bg-light text-center text-muted">
+                            <h6 class="fw-bold">No chunks created yet</h6>
+                            <p class="mb-0">
+                                Upload a PDF to generate text chunks.
+                            </p>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
         </div>
 
-    </div>
-
-    <!-- Phase Notes -->
-    <div class="alert alert-info mt-4">
-        <strong>Phase 2:</strong> PDF upload and text extraction. Next phase: split the extracted text into chunks.
     </div>
 
 </div>
