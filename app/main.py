@@ -2,13 +2,13 @@ from pathlib import Path
 import shutil
 import uuid
 
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.pdf_reader import extract_text_from_pdf
 from app.text_splitter import split_text_into_chunks
-from app.vector_store import build_faiss_index
+from app.vector_store import build_faiss_index, search_similar_chunks
 
 
 app = FastAPI(title="ComplyAI - AI Policy Compliance Assistant")
@@ -44,7 +44,9 @@ def render_home(
     chunk_count=0,
     sample_chunks=None,
     embedding_count=0,
-    vector_dimension=0
+    vector_dimension=0,
+    question=None,
+    retrieved_chunks=None
 ):
     return templates.TemplateResponse(
         request=request,
@@ -59,7 +61,9 @@ def render_home(
             "chunk_count": chunk_count,
             "sample_chunks": sample_chunks or [],
             "embedding_count": embedding_count,
-            "vector_dimension": vector_dimension
+            "vector_dimension": vector_dimension,
+            "question": question,
+            "retrieved_chunks": retrieved_chunks or []
         }
     )
 
@@ -131,5 +135,45 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
     except Exception as error:
         return render_home(
             request=request,
+            error=str(error)
+        )
+
+
+@app.post("/retrieve", response_class=HTMLResponse)
+async def retrieve_chunks(request: Request, question: str = Form(...)):
+    try:
+        if not CURRENT_DOCUMENT["text"]:
+            return render_home(
+                request=request,
+                error="Please upload a PDF before asking a question."
+            )
+
+        retrieved_chunks = search_similar_chunks(
+            question=question,
+            vector_store=VECTOR_STORE,
+            top_k=4
+        )
+
+        return render_home(
+            request=request,
+            filename=CURRENT_DOCUMENT["filename"],
+            text_preview=CURRENT_DOCUMENT["text"][:2000],
+            message="Relevant chunks retrieved successfully.",
+            chunk_count=len(CURRENT_DOCUMENT["chunks"]),
+            sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
+            embedding_count=VECTOR_STORE["embedding_count"],
+            vector_dimension=VECTOR_STORE["dimension"],
+            question=question,
+            retrieved_chunks=retrieved_chunks
+        )
+
+    except Exception as error:
+        return render_home(
+            request=request,
+            filename=CURRENT_DOCUMENT["filename"],
+            chunk_count=len(CURRENT_DOCUMENT["chunks"]),
+            sample_chunks=CURRENT_DOCUMENT["chunks"][:3],
+            embedding_count=VECTOR_STORE["embedding_count"],
+            vector_dimension=VECTOR_STORE["dimension"],
             error=str(error)
         )

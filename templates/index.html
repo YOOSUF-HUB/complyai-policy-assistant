@@ -23,7 +23,8 @@
             <h4 class="text-muted mb-3">{{ subtitle }}</h4>
 
             <p class="lead mb-0">
-                Upload a policy, rules, legal, or compliance PDF. The system extracts text and splits it into chunks for AI retrieval.
+                Upload a policy, rules, legal, or compliance PDF. The system extracts text, creates embeddings,
+                and retrieves the most relevant chunks for your question.
             </p>
         </div>
     </div>
@@ -32,13 +33,14 @@
 
         <!-- Left Panel -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
 
                     <h5 class="fw-bold mb-2">1. Upload Document</h5>
 
                     <p class="text-muted small">
-                        Upload a PDF document. The system will extract text and create overlapping chunks.
+                        Upload a PDF document. The system will extract text, chunk it, embed it, and store it in FAISS.
                     </p>
 
                     {% if message %}
@@ -67,7 +69,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
-                            Upload and Create Chunks
+                            Upload and Build Vector Store
                         </button>
 
                     </form>
@@ -82,10 +84,22 @@
                             <strong>{{ filename }}</strong>
                         </div>
 
-                        <div class="border rounded-3 p-3 bg-light">
+                        <div class="border rounded-3 p-3 bg-light mb-3">
                             <small class="text-muted d-block mb-1">Chunks Created</small>
                             <strong>{{ chunk_count }}</strong>
                         </div>
+
+                        {% if embedding_count %}
+                            <div class="border rounded-3 p-3 bg-light mb-3">
+                                <small class="text-muted d-block mb-1">Embeddings Created</small>
+                                <strong>{{ embedding_count }}</strong>
+                            </div>
+
+                            <div class="border rounded-3 p-3 bg-light">
+                                <small class="text-muted d-block mb-1">Vector Dimension</small>
+                                <strong>{{ vector_dimension }}</strong>
+                            </div>
+                        {% endif %}
                     {% else %}
                         <div class="border rounded-3 p-3 bg-light text-muted">
                             No document uploaded yet.
@@ -95,18 +109,79 @@
                 </div>
             </div>
 
+            {% if filename %}
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-bold mb-2">2. Test Retrieval</h5>
+
+                        <p class="text-muted small">
+                            Ask a question. FAISS will return the most relevant document chunks.
+                        </p>
+
+                        <form action="/retrieve" method="post">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Question</label>
+                                <textarea
+                                    name="question"
+                                    class="form-control"
+                                    rows="4"
+                                    placeholder="Example: What are the eligibility rules?"
+                                    required>{% if question %}{{ question }}{% endif %}</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">
+                                Retrieve Relevant Chunks
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="alert alert-info mt-4">
-                <strong>Phase 4:</strong> The document is now chunked, embedded, and stored in FAISS. Next phase: retrieve relevant chunks for a user question.
+                <strong>Phase 5:</strong> The system can now retrieve relevant chunks for a question.
+                Next phase: generate final answers using Gemini.
             </div>
+
         </div>
 
         <!-- Right Panel -->
         <div class="col-lg-8">
 
+            {% if retrieved_chunks %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-bold mb-2">Retrieved Chunks</h5>
+
+                        <p class="text-muted small">
+                            These are the chunks FAISS selected as most relevant to your question.
+                        </p>
+
+                        {% for item in retrieved_chunks %}
+                            <div class="border rounded-3 p-3 bg-white mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Result {{ loop.index }}</strong>
+                                    <span class="badge text-bg-primary">
+                                        Score: {{ "%.4f"|format(item.score) }}
+                                    </span>
+                                </div>
+
+                                <div style="white-space: pre-wrap; font-size: 14px; line-height: 1.7;">
+                                    {{ item.chunk }}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
 
-                    <h5 class="fw-bold mb-2">2. Extracted Text Preview</h5>
+                    <h5 class="fw-bold mb-2">Extracted Text Preview</h5>
 
                     <p class="text-muted small">
                         First 2,000 characters of the extracted PDF text.
@@ -132,10 +207,10 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
 
-                    <h5 class="fw-bold mb-2">3. Sample Chunks</h5>
+                    <h5 class="fw-bold mb-2">Sample Chunks</h5>
 
                     <p class="text-muted small">
-                        These are the first few chunks created from the document. Later, each chunk will become a searchable vector.
+                        First few chunks created from the document.
                     </p>
 
                     {% if sample_chunks %}
@@ -157,17 +232,6 @@
                             <p class="mb-0">
                                 Upload a PDF to generate text chunks.
                             </p>
-                        </div>
-                    {% endif %}
-                    {% if embedding_count %}
-                        <div class="border rounded-3 p-3 bg-light mt-3">
-                            <small class="text-muted d-block mb-1">Embeddings Created</small>
-                            <strong>{{ embedding_count }}</strong>
-                        </div>
-
-                        <div class="border rounded-3 p-3 bg-light mt-3">
-                            <small class="text-muted d-block mb-1">Vector Dimension</small>
-                            <strong>{{ vector_dimension }}</strong>
                         </div>
                     {% endif %}
 
