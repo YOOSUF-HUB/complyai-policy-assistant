@@ -5,585 +5,454 @@
     <title>{{ app_name }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --bg: #f5f7fb;
-            --card: #ffffff;
-            --text: #111827;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --success-soft: #ecfdf5;
-            --success-text: #047857;
-            --danger-soft: #fef2f2;
-            --danger-text: #b91c1c;
-            --blue-soft: #eff6ff;
-            --dark-box: #0f172a;
-        }
-
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
-        .app-container {
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 32px 18px;
+        .glass {
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(148, 163, 184, 0.16);
         }
 
-        .hero {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            border-radius: 24px;
-            padding: 36px;
-            margin-bottom: 24px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+        .soft-grid {
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+            background-size: 36px 36px;
         }
 
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            color: #dbeafe;
+        .text-gradient {
+            background: linear-gradient(90deg, #60a5fa, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-glow {
+            box-shadow:
+                0 0 0 1px rgba(148, 163, 184, 0.12),
+                0 24px 70px rgba(15, 23, 42, 0.45);
+        }
+
+        .output-scroll::-webkit-scrollbar,
+        .source-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .output-scroll::-webkit-scrollbar-thumb,
+        .source-scroll::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.6);
             border-radius: 999px;
-            padding: 7px 13px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 14px;
         }
 
-        .hero h1 {
-            font-size: clamp(34px, 5vw, 48px);
-            font-weight: 850;
-            letter-spacing: -1.4px;
-            margin-bottom: 10px;
-        }
-
-        .hero p {
-            color: #cbd5e1;
-            max-width: 780px;
-            line-height: 1.7;
-            margin-bottom: 0;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 22px;
-        }
-
-        .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 22px;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
-        }
-
-        .panel-body {
-            padding: 24px;
-        }
-
-        .section-title {
-            font-size: 19px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .section-desc {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 18px;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            border-color: var(--border);
-            padding: 12px 14px;
-        }
-
-        .btn-main {
-            width: 100%;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-weight: 750;
-            background: var(--primary);
-            color: white;
-            transition: 0.18s ease;
-        }
-
-        .btn-main:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-soft {
-            width: 100%;
-            border-radius: 12px;
-            padding: 11px 14px;
-            font-weight: 700;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .status-card {
-            background: #f9fafb;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px;
-        }
-
-        .status-label {
-            color: var(--muted);
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
-
-        .status-value {
-            font-size: 16px;
-            font-weight: 800;
-            word-break: break-word;
-        }
-
-        .alert-success-custom {
-            background: var(--success-soft);
-            color: var(--success-text);
-            border: 1px solid #bbf7d0;
-            border-radius: 14px;
-            padding: 12px 14px;
-            font-weight: 650;
-            margin-bottom: 16px;
-        }
-
-        .alert-danger-custom {
-            background: var(--danger-soft);
-            color: var(--danger-text);
-            border: 1px solid #fecaca;
-            border-radius: 14px;
-            padding: 12px 14px;
-            font-weight: 650;
-            margin-bottom: 16px;
-        }
-
-        .output-box {
-            background: var(--blue-soft);
-            border: 1px solid #bfdbfe;
-            color: #1e3a8a;
-            border-radius: 18px;
-            padding: 20px;
-            white-space: pre-wrap;
-            font-size: 15px;
-            line-height: 1.8;
-        }
-
-        .compliance-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            color: #111827;
-            border-radius: 18px;
-            padding: 20px;
-            white-space: pre-wrap;
-            font-size: 15px;
-            line-height: 1.8;
-        }
-
-        .empty-output {
-            border: 1px dashed #cbd5e1;
-            background: #f9fafb;
-            border-radius: 18px;
-            padding: 46px 24px;
-            text-align: center;
-            color: var(--muted);
-        }
-
-        .empty-output h5 {
-            color: var(--text);
-            font-weight: 800;
-        }
-
-        .source-card {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
-            background: white;
-            margin-bottom: 12px;
-        }
-
-        .score-badge {
-            display: inline-block;
-            background: #eef2ff;
-            color: var(--primary);
-            padding: 5px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .source-text {
-            white-space: pre-wrap;
-            font-size: 13px;
-            line-height: 1.7;
-            color: #374151;
-        }
-
-        .preview-box {
-            background: var(--dark-box);
-            color: #d1d5db;
-            border-radius: 16px;
-            padding: 16px;
-            max-height: 280px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: "SFMono-Regular", Consolas, monospace;
-            font-size: 13px;
-            line-height: 1.7;
-        }
-
-        .accordion-button {
-            font-weight: 750;
-            border-radius: 14px !important;
-        }
-
-        .accordion-item {
-            border: 1px solid var(--border);
-            border-radius: 14px !important;
-            overflow: hidden;
-        }
-
-        .small-note {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        @media (max-width: 980px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero {
-                padding: 28px;
-            }
+        .output-scroll::-webkit-scrollbar-track,
+        .source-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
         }
     </style>
 </head>
 
-<body>
+<body class="min-h-screen bg-[#020617] text-slate-100 soft-grid">
 
-<div class="app-container">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 left-1/4 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl"></div>
+        <div class="absolute top-20 right-0 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/70 to-slate-950"></div>
+    </div>
 
-    <!-- Hero -->
-    <section class="hero">
-        <span class="hero-badge">RAG + Compliance Workflows</span>
-        <h1>{{ app_name }}</h1>
-        <p>
-            AI Policy & Document Compliance Assistant. Upload a rules, policy, legal, or compliance PDF,
-            ask questions, generate checklists, detect risks, and create concise compliance reports.
-        </p>
-    </section>
+    <!-- App Shell -->
+    <div class="mx-auto max-w-7xl px-5 py-6">
 
-    <div class="layout">
+        <!-- Navbar -->
+        <nav class="glass card-glow mb-8 flex items-center justify-between rounded-3xl px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 shadow-lg shadow-blue-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
 
-        <!-- Left Control Panel -->
-        <div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-extrabold tracking-tight">{{ app_name }}</h1>
+                        <span class="rounded-full border border-blue-400/20 bg-blue-500/10 px-2 py-0.5 text-[11px] font-bold text-blue-300">
+                            RAG
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">{{ subtitle }}</p>
+                </div>
+            </div>
 
-            <!-- Upload Panel -->
-            <div class="panel mb-4">
-                <div class="panel-body">
-                    <h2 class="section-title">1. Upload Document</h2>
-                    <p class="section-desc">
-                        Upload a PDF. The system extracts text, creates chunks, embeds them, and builds a FAISS vector store.
-                    </p>
+            <div class="hidden items-center gap-6 text-sm font-medium text-slate-400 md:flex">
+                <a href="#workspace" class="hover:text-white">Workspace</a>
+                <a href="#workflows" class="hover:text-white">Workflows</a>
+                <a href="#evidence" class="hover:text-white">Evidence</a>
+            </div>
 
-                    {% if message %}
-                        <div class="alert-success-custom">
-                            {{ message }}
+            <div class="hidden md:block">
+                <span class="rounded-full border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm text-slate-300">
+                    Local Prototype
+                </span>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="mb-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div class="py-6">
+                <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    Policy intelligence workspace
+                </div>
+
+                <h2 class="max-w-4xl text-5xl font-black leading-tight tracking-tight text-white md:text-6xl">
+                    Turn dense policy PDFs into
+                    <span class="text-gradient">audit-ready intelligence.</span>
+                </h2>
+
+                <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
+                    Upload a rules, legal, policy, or compliance document. ComplyAI extracts, chunks, embeds, and indexes it,
+                    then answers questions, generates checklists, surfaces risks, and produces concise reports.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="#workspace" class="rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.02]">
+                        Open workspace →
+                    </a>
+
+                    <a href="#workflows" class="rounded-2xl border border-slate-700 bg-slate-900/70 px-6 py-3 text-sm font-bold text-slate-200 transition hover:border-slate-500 hover:bg-slate-800">
+                        See workflows
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Status Card -->
+            <div class="glass card-glow rounded-3xl p-6">
+                <div class="mb-5 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-400">System Status</p>
+                        <h3 class="mt-1 text-2xl font-extrabold text-white">
+                            {% if filename %}
+                                Document Indexed
+                            {% else %}
+                                Awaiting Upload
+                            {% endif %}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-2xl bg-emerald-500/10 p-3 text-emerald-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                {% if filename %}
+                    <div class="rounded-2xl border border-slate-700/70 bg-slate-950/60 p-4">
+                        <p class="text-xs uppercase tracking-widest text-slate-500">Current document</p>
+                        <p class="mt-2 break-words text-sm font-bold text-slate-100">{{ filename }}</p>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-3 gap-3">
+                        <div class="rounded-2xl border border-slate-700/70 bg-slate-950/60 p-4">
+                            <p class="text-xs text-slate-500">Chunks</p>
+                            <p class="mt-1 text-xl font-extrabold">{{ chunk_count }}</p>
                         </div>
-                    {% endif %}
 
-                    {% if error %}
-                        <div class="alert-danger-custom">
-                            {{ error }}
+                        <div class="rounded-2xl border border-slate-700/70 bg-slate-950/60 p-4">
+                            <p class="text-xs text-slate-500">Embeddings</p>
+                            <p class="mt-1 text-xl font-extrabold">{{ embedding_count }}</p>
                         </div>
-                    {% endif %}
 
-                    <form action="/upload" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">PDF document</label>
+                        <div class="rounded-2xl border border-slate-700/70 bg-slate-950/60 p-4">
+                            <p class="text-xs text-slate-500">Vector</p>
+                            <p class="mt-1 text-xl font-extrabold">{{ vector_dimension }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="rounded-2xl border border-dashed border-slate-700 bg-slate-950/50 p-8 text-center">
+                        <p class="font-bold text-white">No document uploaded</p>
+                        <p class="mt-2 text-sm text-slate-400">
+                            Upload a PDF to start compliance analysis.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Alerts -->
+        {% if message %}
+            <div class="mb-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-5 py-4 text-sm font-semibold text-emerald-300">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="mb-6 rounded-2xl border border-red-400/20 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-300">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <!-- Workspace -->
+        <main id="workspace" class="grid gap-6 lg:grid-cols-[390px_1fr]">
+
+            <!-- Left Panel -->
+            <aside class="space-y-6">
+
+                <!-- Upload Card -->
+                <section class="glass card-glow rounded-3xl p-6">
+                    <div class="mb-5 flex items-start gap-4">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-sm font-black text-blue-300">
+                            01
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-extrabold text-white">Upload document</h3>
+                            <p class="mt-1 text-sm leading-6 text-slate-400">
+                                PDF is extracted, chunked, embedded, and indexed into a FAISS vector store.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-4">
+                        <label class="group flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-950/50 px-5 py-8 text-center transition hover:border-blue-400/50 hover:bg-blue-500/5">
+                            <div class="mb-3 rounded-2xl bg-slate-900 p-3 text-slate-400 group-hover:text-blue-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4m0 0l-4 4m4-4l4 4"/>
+                                </svg>
+                            </div>
+
+                            <span class="text-sm font-bold text-slate-200">Choose PDF file</span>
+                            <span class="mt-1 text-xs text-slate-500">Text-based PDFs work best</span>
+
                             <input
                                 type="file"
                                 name="file"
                                 accept="application/pdf"
-                                class="form-control"
+                                class="mt-5 block w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-500 file:px-3 file:py-2 file:text-sm file:font-bold file:text-white"
                                 required
                             >
-                        </div>
+                        </label>
 
-                        <button type="submit" class="btn-main">
-                            Upload and Process
+                        <button type="submit" class="w-full rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01]">
+                            Upload and process
                         </button>
                     </form>
-                </div>
-            </div>
+                </section>
 
-            <!-- Ask Question Panel -->
-            {% if filename %}
-                <div class="panel mb-4">
-                    <div class="panel-body">
-                        <h2 class="section-title">2. Ask Question</h2>
-                        <p class="section-desc">
-                            Ask a document-specific question. The answer will be generated from retrieved source chunks.
-                        </p>
+                <!-- Ask Question -->
+                {% if filename %}
+                    <section class="glass card-glow rounded-3xl p-6">
+                        <div class="mb-5 flex items-start gap-4">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-sm font-black text-emerald-300">
+                                02
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-extrabold text-white">Ask question</h3>
+                                <p class="mt-1 text-sm leading-6 text-slate-400">
+                                    Get answers grounded in retrieved document evidence.
+                                </p>
+                            </div>
+                        </div>
 
                         <form action="/ask" method="post">
                             <textarea
                                 name="question"
-                                class="form-control mb-3"
-                                rows="4"
+                                rows="5"
                                 placeholder="Example: What are the eligibility rules?"
+                                class="w-full resize-none rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-sm text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-blue-400"
                                 required>{% if question %}{{ question }}{% endif %}</textarea>
 
-                            <button type="submit" class="btn-main">
-                                Generate Answer
+                            <button type="submit" class="mt-4 w-full rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-emerald-400">
+                                Generate answer
                             </button>
                         </form>
+                    </section>
+
+                    <!-- Workflows -->
+                    <section id="workflows" class="glass card-glow rounded-3xl p-6">
+                        <div class="mb-5 flex items-start gap-4">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-sm font-black text-violet-300">
+                                03
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-extrabold text-white">Compliance workflows</h3>
+                                <p class="mt-1 text-sm leading-6 text-slate-400">
+                                    Run structured analysis workflows on the indexed document.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <form action="/compliance-task" method="post">
+                                <input type="hidden" name="task_type" value="summary">
+                                <button type="submit" class="w-full rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-left text-sm font-bold text-blue-200 transition hover:bg-blue-500/20">
+                                    Summarize rules
+                                </button>
+                            </form>
+
+                            <form action="/compliance-task" method="post">
+                                <input type="hidden" name="task_type" value="checklist">
+                                <button type="submit" class="w-full rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-left text-sm font-bold text-cyan-200 transition hover:bg-cyan-500/20">
+                                    Generate checklist
+                                </button>
+                            </form>
+
+                            <form action="/compliance-task" method="post">
+                                <input type="hidden" name="task_type" value="risks">
+                                <button type="submit" class="w-full rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-left text-sm font-bold text-red-200 transition hover:bg-red-500/20">
+                                    Find risks
+                                </button>
+                            </form>
+
+                            <form action="/compliance-task" method="post">
+                                <input type="hidden" name="task_type" value="report">
+                                <button type="submit" class="w-full rounded-2xl border border-slate-500/30 bg-slate-800/60 px-4 py-3 text-left text-sm font-bold text-slate-200 transition hover:bg-slate-700">
+                                    Generate report
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+                {% endif %}
+            </aside>
+
+            <!-- Right Panel -->
+            <section class="space-y-6">
+
+                <!-- Main Output -->
+                <section class="glass card-glow rounded-3xl p-6">
+                    <div class="mb-5 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-semibold text-blue-300">Output</p>
+                            <h3 class="mt-1 text-2xl font-extrabold text-white">
+                                {% if answer %}
+                                    Grounded Answer
+                                {% elif compliance_result %}
+                                    Compliance Output
+                                {% else %}
+                                    Awaiting Analysis
+                                {% endif %}
+                            </h3>
+                        </div>
+
+                        {% if task_type %}
+                            <span class="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-300">
+                                {{ task_type|capitalize }}
+                            </span>
+                        {% endif %}
                     </div>
-                </div>
-
-                <!-- Workflow Panel -->
-                <div class="panel">
-                    <div class="panel-body">
-                        <h2 class="section-title">3. Compliance Workflows</h2>
-                        <p class="section-desc">
-                            Run structured AI workflows on the uploaded document.
-                        </p>
-
-                        <form action="/compliance-task" method="post" class="mb-2">
-                            <input type="hidden" name="task_type" value="summary">
-                            <button type="submit" class="btn btn-outline-primary btn-soft">
-                                Summarize Rules
-                            </button>
-                        </form>
-
-                        <form action="/compliance-task" method="post" class="mb-2">
-                            <input type="hidden" name="task_type" value="checklist">
-                            <button type="submit" class="btn btn-outline-primary btn-soft">
-                                Generate Checklist
-                            </button>
-                        </form>
-
-                        <form action="/compliance-task" method="post" class="mb-2">
-                            <input type="hidden" name="task_type" value="risks">
-                            <button type="submit" class="btn btn-outline-danger btn-soft">
-                                Find Risks
-                            </button>
-                        </form>
-
-                        <form action="/compliance-task" method="post">
-                            <input type="hidden" name="task_type" value="report">
-                            <button type="submit" class="btn btn-outline-dark btn-soft">
-                                Generate Report
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            {% endif %}
-
-        </div>
-
-        <!-- Right Output Panel -->
-        <div>
-
-            <!-- Document Status -->
-            <div class="panel mb-4">
-                <div class="panel-body">
-                    <h2 class="section-title">Document Status</h2>
-
-                    {% if filename %}
-                        <p class="section-desc mb-3">
-                            Current uploaded document and vector store details.
-                        </p>
-
-                        <div class="status-card mb-3">
-                            <div class="status-label">Filename</div>
-                            <div class="status-value">{{ filename }}</div>
-                        </div>
-
-                        <div class="status-grid">
-                            <div class="status-card">
-                                <div class="status-label">Chunks</div>
-                                <div class="status-value">{{ chunk_count }}</div>
-                            </div>
-
-                            <div class="status-card">
-                                <div class="status-label">Embeddings</div>
-                                <div class="status-value">{{ embedding_count }}</div>
-                            </div>
-
-                            <div class="status-card">
-                                <div class="status-label">Vector Dimension</div>
-                                <div class="status-value">{{ vector_dimension }}</div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="empty-output">
-                            <h5>No document uploaded</h5>
-                            <p class="mb-0">
-                                Upload a PDF to begin compliance analysis.
-                            </p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Main Output -->
-            <div class="panel mb-4">
-                <div class="panel-body">
-                    <h2 class="section-title">Output</h2>
 
                     {% if answer %}
-                        <p class="section-desc">
-                            Answer generated using retrieved document chunks.
-                        </p>
-
-                        <div class="output-box">{{ answer }}</div>
+                        <div class="output-scroll max-h-[520px] overflow-y-auto rounded-3xl border border-blue-400/20 bg-blue-500/10 p-5 text-[15px] leading-8 text-blue-100 whitespace-pre-wrap">
+                            {{ answer }}
+                        </div>
 
                     {% elif compliance_result %}
-                        <p class="section-desc">
-                            Workflow:
-                            {% if task_type %}
-                                <strong>{{ task_type|capitalize }}</strong>
-                            {% else %}
-                                <strong>Compliance task</strong>
-                            {% endif %}
-                        </p>
-
-                        <div class="compliance-box">{{ compliance_result }}</div>
+                        <div class="output-scroll max-h-[620px] overflow-y-auto rounded-3xl border border-slate-700 bg-slate-950/70 p-5 text-[15px] leading-8 text-slate-200 whitespace-pre-wrap">
+                            {{ compliance_result }}
+                        </div>
 
                     {% else %}
-                        <div class="empty-output">
-                            <h5>No output yet</h5>
-                            <p class="mb-0">
+                        <div class="rounded-3xl border border-dashed border-slate-700 bg-slate-950/50 p-14 text-center">
+                            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <p class="font-extrabold text-white">No output yet</p>
+                            <p class="mt-2 text-sm text-slate-400">
                                 Upload a PDF, then ask a question or run a compliance workflow.
                             </p>
                         </div>
                     {% endif %}
-                </div>
-            </div>
+                </section>
 
-            <!-- Source Chunks -->
-            {% if retrieved_chunks %}
-                <div class="panel mb-4">
-                    <div class="panel-body">
-                        <h2 class="section-title">Source Evidence</h2>
-                        <p class="section-desc">
-                            Retrieved chunks used as context for the answer.
-                        </p>
+                <!-- Source Evidence -->
+                {% if retrieved_chunks %}
+                    <section id="evidence" class="glass card-glow rounded-3xl p-6">
+                        <div class="mb-5">
+                            <p class="text-sm font-semibold text-emerald-300">Evidence</p>
+                            <h3 class="mt-1 text-2xl font-extrabold text-white">Retrieved source chunks</h3>
+                            <p class="mt-2 text-sm text-slate-400">
+                                These chunks were retrieved from FAISS and used as context for the answer.
+                            </p>
+                        </div>
 
-                        {% for item in retrieved_chunks %}
-                            <div class="source-card">
-                                <div class="score-badge">
-                                    Source {{ loop.index }} · Score {{ "%.4f"|format(item.score) }}
+                        <div class="source-scroll max-h-[520px] space-y-4 overflow-y-auto pr-2">
+                            {% for item in retrieved_chunks %}
+                                <div class="rounded-3xl border border-slate-700 bg-slate-950/60 p-5">
+                                    <div class="mb-3 inline-flex rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-extrabold text-emerald-300">
+                                        Source {{ loop.index }} · Score {{ "%.4f"|format(item.score) }}
+                                    </div>
+
+                                    <div class="whitespace-pre-wrap text-sm leading-7 text-slate-300">
+                                        {{ item.chunk }}
+                                    </div>
                                 </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
 
-                                <div class="source-text">{{ item.chunk }}</div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
+                <!-- Technical Details -->
+                {% if filename %}
+                    <section class="grid gap-6 xl:grid-cols-2">
 
-            <!-- Debug / Technical Details -->
-            {% if filename %}
-                <div class="accordion" id="technicalDetails">
+                        <!-- Extracted Preview -->
+                        <details class="glass rounded-3xl p-6">
+                            <summary class="cursor-pointer text-lg font-extrabold text-white">
+                                Extracted text preview
+                            </summary>
 
-                    <div class="accordion-item mb-3">
-                        <h2 class="accordion-header" id="headingPreview">
-                            <button class="accordion-button collapsed" type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapsePreview"
-                                    aria-expanded="false"
-                                    aria-controls="collapsePreview">
-                                View extracted text preview
-                            </button>
-                        </h2>
-
-                        <div id="collapsePreview"
-                             class="accordion-collapse collapse"
-                             aria-labelledby="headingPreview"
-                             data-bs-parent="#technicalDetails">
-
-                            <div class="accordion-body">
+                            <div class="output-scroll mt-5 max-h-[320px] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950/70 p-4 text-sm leading-7 text-slate-300 whitespace-pre-wrap">
                                 {% if text_preview %}
-                                    <div class="preview-box">{{ text_preview }}</div>
+                                    {{ text_preview }}
                                 {% else %}
-                                    <p class="small-note mb-0">No extracted text preview available.</p>
+                                    No extracted text preview available.
                                 {% endif %}
                             </div>
-                        </div>
-                    </div>
+                        </details>
 
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingChunks">
-                            <button class="accordion-button collapsed" type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapseChunks"
-                                    aria-expanded="false"
-                                    aria-controls="collapseChunks">
-                                View sample chunks
-                            </button>
-                        </h2>
+                        <!-- Sample Chunks -->
+                        <details class="glass rounded-3xl p-6">
+                            <summary class="cursor-pointer text-lg font-extrabold text-white">
+                                Sample chunks
+                            </summary>
 
-                        <div id="collapseChunks"
-                             class="accordion-collapse collapse"
-                             aria-labelledby="headingChunks"
-                             data-bs-parent="#technicalDetails">
-
-                            <div class="accordion-body">
+                            <div class="source-scroll mt-5 max-h-[320px] space-y-4 overflow-y-auto pr-2">
                                 {% if sample_chunks %}
                                     {% for chunk in sample_chunks %}
-                                        <div class="source-card">
-                                            <div class="score-badge">
+                                        <div class="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                                            <div class="mb-2 inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
                                                 Chunk {{ loop.index }} · {{ chunk|length }} chars
                                             </div>
 
-                                            <div class="source-text">{{ chunk }}</div>
+                                            <div class="whitespace-pre-wrap text-sm leading-7 text-slate-300">
+                                                {{ chunk }}
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 {% else %}
-                                    <p class="small-note mb-0">No chunks created yet.</p>
+                                    <p class="text-sm text-slate-400">No chunks created yet.</p>
                                 {% endif %}
                             </div>
-                        </div>
-                    </div>
+                        </details>
 
-                </div>
-            {% endif %}
-
-        </div>
-
+                    </section>
+                {% endif %}
+            </section>
+        </main>
     </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
